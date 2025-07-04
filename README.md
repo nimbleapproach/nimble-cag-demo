@@ -1,10 +1,10 @@
-# CAG_Restaurant
+# CAG_Demo
 
-This project contains the backend API and frontend UI for the CAG Restaurant application.
+This project contains the backend API and frontend UI for the CAG Demo application.
 
 ## Getting Started
 
-To get the application running locally, follow these steps. These scripts should be run from the root of the `CAG_Restaurant` directory.
+To get the application running locally, follow these steps. These scripts should be run from the root of the `nimble-cag-demo` directory.
 
 ### 1. Set Up the Environment
 
