@@ -1,0 +1,62 @@
+
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bella-terra-db
+    restart: always
+    environment:
+      - POSTGRES_USER=bellaterra
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bellaterra_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  db-populator:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: bella-terra-db-populator
+    depends_on:
+      - db
+    command: ["python", "populate_db.py"]
+    environment:
+      - DB_HOST=db
+      - POSTGRES_DB=bellaterra_db
+      - POSTGRES_USER=bellaterra
+      - POSTGRES_PASSWORD=password
+      - DB_PORT=5432
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: bella-terra-api
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - '8000:8000'
+    environment:
+      - DATABASE_URL=postgresql://bellaterra:password@db:5432/bellaterra_db
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - .:/app
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: bella-terra-frontend
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:8000
+
+volumes:
+  postgres_data:
