@@ -4,32 +4,56 @@ This project contains the backend API and frontend UI for the CAG Demo applicati
 
 ## Getting Started
 
-To get the application running locally, follow these steps. These scripts should be run from the root of the `nimble-cag-demo` directory.
+To get the application running locally using Docker Compose, follow these steps. These commands should be run from the root of the `nimble-cag-demo` directory.
 
-### 1. Set Up the Environment
+### Prerequisites
 
-This script prepares your environment by setting up the necessary dependencies.
+Make sure you have Docker Desktop installed and running on your system.
 
-```bash
-./setup.sh
-```
+### 1. Set Up Environment Variables
 
-### 2. Run the API
-
-This script starts the backend FastAPI server. Make sure this is running before you start the frontend.
+Copy the example environment file and fill in your OpenAI API key:
 
 ```bash
-./run_api.sh
+cp .env.example .env
+# Open .env and add your OPENAI_API_KEY
 ```
 
-The API will be available at `http://localhost:8000`.
+Or create a .env and then add OPENAI_API_KEY=YOUR_KEY 
 
-### 3. Start the Frontend UI
+### 2. Start the Application Stack
 
-This script launches the Next.js frontend application.
+This command will build the Docker images (if not already built), create the necessary containers (PostgreSQL database, API, and Frontend), and start all services in detached mode.
 
 ```bash
-./start_full_stack.sh
+docker compose up --build -d
 ```
 
-You can now access the application in your browser, likely at `http://localhost:3000`.
+### 3. Access the Application
+
+Once all services are up and running, you can access the application in your browser:
+
+*   **Frontend UI:** `http://localhost:3000`
+*   **Backend API:** `http://localhost:8000`
+
+### Stopping the Application
+
+To stop and remove all running containers, networks, and volumes created by Docker Compose:
+
+```bash
+docker compose down -v
+```
+
+### Viewing Logs
+
+To view real-time logs from all services (useful for debugging):
+
+```bash
+docker compose logs -f
+```
+
+To view logs from a specific service (e.g., the API):
+
+```bash
+docker compose logs -f api
+```
