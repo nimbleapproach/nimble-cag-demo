@@ -1,6 +1,46 @@
 # Bella Terra CAG System
 
-A Context Augmentation Generation (CAG) system for the Bella Terra restaurant, providing intelligent menu recommendations and information through AI-powered agents.
+
+This project demonstrates Crew AI with CAG (Context-Aware Generation) for intelligent restaurant menu and wine pairing recommendations. The application includes a backend API powered by FastAPI and OpenAI, a modern frontend built with Next.js and TypeScript, and comprehensive sample data from BellaTerra restaurant including menus, wine lists, and regional culinary stories.
+
+The demo showcases how CAG can provide contextually aware responses by leveraging structured data about restaurant offerings, customer preferences, and regional culinary traditions to generate personalized recommendations.
+
+## Project Structure
+
+This section provides an overview of the key files and directories in the project root:
+
+### Core Application Files
+- **`api.py`** - Main FastAPI backend server that handles API requests
+- **`cag_system.py`** - Core CAG (Context-Aware Generation) system implementation
+- **`docker-compose.yml`** - Docker Compose configuration for running the full application stack
+- **`Dockerfile.api`** - Docker configuration for the backend API service
+- **`Dockerfile.frontend`** - Docker configuration for the frontend service
+- **`populate_db.py`** - Database population script with sample data
+
+### Frontend
+- **`frontend/`** - Next.js React application with TypeScript and Tailwind CSS
+
+### Database
+- **`database/schema.sql`** - PostgreSQL database schema definition
+
+### Data and Content
+- **`data/`** - Application data including regional culinary stories and menu philosophies
+- **`BellaTerra/`** - Restaurant-specific content including menus and wine lists
+
+### Scripts and Utilities (for use outside of Docker)
+- **`setup.sh`** - Initial project setup script
+- **`start_full_stack.sh`** - Script to start the complete application stack
+- **`run_api.sh`** - Script to run the API server locally
+- **`test_api.py`** - API testing utilities
+
+### Dependencies
+- **`requirements.txt`** - Python dependencies for the main application
+- **`requirements_api.txt`** - Python dependencies specifically for the API
+
+### Configuration Files
+- **`.env.example`** - Example environment variables template
+- **`.gitignore`** - Git ignore rules
+- **`.dockerignore`** - Docker ignore rules
 
 ## 🏗️ Architecture
 
@@ -138,70 +178,59 @@ npm install
 npm run dev
 ```
 
-## 🧠 CAG System Components
+## AI Workflow
+
+The CAG (Context-Aware Generation) system uses a multi-agent workflow to provide intelligent responses about Bella Terra restaurant. The system combines vector search for contextual knowledge with SQL queries for structured data.
 
 ### Agents
 
-- **Context Analyst**: Analyzes queries and determines if SQL data is needed
-- **SQL Query Agent**: Executes database queries for structured data
-- **Context Augmenter**: Enhances context with additional insights
-- **Response Generator**: Creates comprehensive responses
+1. **Context Analyst** - Analyzes user queries and determines whether structured SQL data is needed
+2. **SQL Query Agent** - Executes natural language to SQL queries against the menu database (if required)
+3. **Context Augmenter** - Enhances retrieved context with additional insights and relationships
+4. **Response Generator** - Creates comprehensive, accurate responses using all available context
 
-### Tasks
+### Data Sources
 
-- SQL query determination and execution
-- Context analysis and augmentation
-- Response generation with enhanced insights
+- **Vector Store** (ChromaDB) - Contains restaurant philosophy, regional culinary stories, and menu descriptions
+- **SQL Database** (PostgreSQL) - Stores structured menu data including prices, ingredients, and dietary information
 
-### Vector Store
+### Workflow Diagram
 
-- ChromaDB for semantic search
-- OpenAI embeddings for document retrieval
-- Automatic markdown processing and chunking
-
-## 📊 Database Schema
-
-The system uses PostgreSQL with the following main table:
-
-```sql
-CREATE TABLE menu_items (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    description TEXT,
-    price DECIMAL(10,2),
-    category VARCHAR(100),
-    is_vegetarian BOOLEAN DEFAULT FALSE,
-    is_vegan BOOLEAN DEFAULT FALSE,
-    is_gluten_free BOOLEAN DEFAULT FALSE,
-    properties JSONB
-);
+```mermaid
+graph TD
+    A[User Query] --> B[Retrieve Context<br/>Vector Store Search]
+    B --> C[SQL Query Task<br/>Agent: Context Analyst]
+    C --> D{Requires SQL Data?}
+    
+    D -->|Yes| E[Execute SQL Task<br/>Agent: SQL Query Agent]
+    D -->|No| F[Context Analysis Task<br/>Agent: Context Analyst]
+    
+    E --> G[NL2SQL Tool]
+    G --> H[PostgreSQL Database]
+    H --> I[SQL Results]
+    I --> F
+    
+    F --> J[Context Augmentation Task<br/>Agent: Context Augmenter]
+    J --> K[Response Generation Task<br/>Agent: Response Generator]
+    K --> L[Return to User]
+    
+    style A fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    style L fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style H fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style B fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style C fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style E fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style F fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style J fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style K fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
 ```
 
-## 🔌 API Endpoints
+### Task Flow
 
-### Query Processing
+1. **SQL Query Task** - The Context Analyst evaluates whether the query needs structured data (prices, ingredients, etc.) or can be answered with descriptive content
+2. **SQL Execution Task** - If SQL data is needed, the SQL Query Agent converts natural language to SQL and queries the database. Vector search retrieves relevant contextual information
+3. **Context Analysis** - The Context Analyst examines both vector store results and SQL data to identify key information and relationships
+4. **Context Augmentation** - The Context Augmenter enhances the information by identifying patterns, relationships, and implicit connections between menu items
+5. **Response Generation** - The Response Generator creates a comprehensive, accurate response using all available context
 
-- `POST /api/query` - Synchronous query processing
-- `POST /api/query/async` - Asynchronous query processing
-- `GET /api/jobs/{job_id}` - Check async job status
-
-### Health & Status
-
-- `GET /` - Basic health check
-- `GET /health` - Detailed health status
-
-### WebSocket
-
-- `WS /api/ws/query` - Real-time query processing
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This workflow ensures responses are both contextually rich and factually accurate, combining the depth of descriptive content with the precision of structured data.
