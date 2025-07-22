@@ -13,32 +13,30 @@ nimble-cag-demo/
 ├── api/                    # FastAPI backend service
 │   ├── main.py            # API entry point
 │   ├── Dockerfile         # API container configuration
-│   ├── requirements.txt   # API dependencies
+│   ├── tests/             # API tests
+│   ├── cag/               # CAG system library
+│   │   ├── core/          # Core CAG components
+│   │   ├── agents/        # CrewAI agents
+│   │   ├── tasks/         # Agent tasks
+│   │   └── utils/         # Utility functions
 │   └── app/               # API application modules
 │       ├── models.py      # Pydantic models
 │       ├── routes/        # API endpoints
 │       ├── services/      # Business logic services
 │       └── middleware/    # Middleware components
-├── cag/                   # CAG system library
-│   ├── requirements.txt   # CAG dependencies
-│   ├── core/              # Core CAG components
-│   ├── agents/            # CrewAI agents
-│   ├── tasks/             # Agent tasks
-│   └── utils/             # Utility functions
 ├── db_populator/          # Database population service
-│   ├── main.py           # Database populator entry point
-│   ├── Dockerfile        # Database populator container
-│   ├── requirements.txt  # Database dependencies
-│   ├── parsers/          # Menu parsing logic
-│   └── database/         # Database operations
-├── frontend/             # Next.js frontend
-│   ├── Dockerfile        # Frontend container configuration
-│   ├── package.json      # Frontend dependencies
-│   └── src/              # Frontend source code
-├── data/                 # Restaurant knowledge base
-├── BellaTerra/           # Menu files
-├── chroma_db/            # Vector store data
-└── docker-compose.yml    # Service orchestration
+│   ├── main.py            # Database populator entry point
+│   ├── Dockerfile         # Database populator container
+│   ├── parsers/           # Menu parsing logic
+│   └── database/          # Database operations
+├── frontend/              # Next.js frontend
+│   ├── Dockerfile         # Frontend container configuration
+│   ├── public/            # Static assets
+│   └── src/               # Frontend source code
+├── data/                  # Restaurant knowledge base
+├── BellaTerra/            # Menu files
+├── chroma_db/             # Vector store data
+├── docker-compose.yml     # Service orchestration
 ```
 
 ## 🚀 Quick Start
@@ -47,7 +45,6 @@ nimble-cag-demo/
 
 - Docker and Docker Compose
 - OpenAI API key
-- Node.js (for frontend development)
 
 ### 1. Environment Setup
 
@@ -60,15 +57,16 @@ OPENAI_API_KEY=your_openai_api_key_here
 ### 2. Start the Full Stack
 
 ```bash
-# Make the start script executable
-chmod +x start_full_stack.sh
+# Build and start all services
+docker-compose up --build
 
-# Start all services
-./start_full_stack.sh
+# Run in background
+docker-compose up -d --build
 ```
 
 This will start:
 - **Database**: PostgreSQL with Bella Terra menu data
+- **Database Populator**: Automatically populates the database with menu data
 - **API**: FastAPI backend with CAG system integration
 - **Frontend**: Next.js web interface
 
@@ -88,6 +86,9 @@ docker-compose up --build
 
 # Run in background
 docker-compose up -d --build
+
+# Stop all services
+docker-compose down
 ```
 
 ### Individual Services
