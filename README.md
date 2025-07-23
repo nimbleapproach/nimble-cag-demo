@@ -1,4 +1,5 @@
-# CAG_Demo
+# Bella Terra CAG System
+
 
 This project demonstrates Crew AI with CAG (Context-Aware Generation) for intelligent restaurant menu and wine pairing recommendations. The application includes a backend API powered by FastAPI and OpenAI, a modern frontend built with Next.js and TypeScript, and comprehensive sample data from BellaTerra restaurant including menus, wine lists, and regional culinary stories.
 
@@ -41,60 +42,140 @@ This section provides an overview of the key files and directories in the projec
 - **`.gitignore`** - Git ignore rules
 - **`.dockerignore`** - Docker ignore rules
 
-## Getting Started
+## 🏗️ Architecture
 
-To get the application running locally using Docker Compose, follow these steps. These commands should be run from the root of the `nimble-cag-demo` directory.
+The system is structured into three main components:
+
+### 📁 Directory Structure
+
+```
+nimble-cag-demo/
+├── api/                    # FastAPI backend service
+│   ├── main.py            # API entry point
+│   ├── Dockerfile         # API container configuration
+│   ├── tests/             # API tests
+│   ├── cag/               # CAG system library
+│   │   ├── core/          # Core CAG components
+│   │   ├── agents/        # CrewAI agents
+│   │   ├── tasks/         # Agent tasks
+│   │   └── utils/         # Utility functions
+│   └── app/               # API application modules
+│       ├── models.py      # Pydantic models
+│       ├── routes/        # API endpoints
+│       ├── services/      # Business logic services
+│       └── middleware/    # Middleware components
+├── db_populator/          # Database population service
+│   ├── main.py            # Database populator entry point
+│   ├── Dockerfile         # Database populator container
+│   ├── parsers/           # Menu parsing logic
+│   └── database/          # Database operations
+├── frontend/              # Next.js frontend
+│   ├── Dockerfile         # Frontend container configuration
+│   ├── public/            # Static assets
+│   └── src/               # Frontend source code
+├── data/                  # Restaurant knowledge base
+├── BellaTerra/            # Menu files
+├── chroma_db/             # Vector store data
+├── docker-compose.yml     # Service orchestration
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-Make sure you have Docker Desktop installed and running on your system.
+- Docker and Docker Compose
+- OpenAI API key
 
-### 1. Set Up Environment Variables
+### 1. Environment Setup
 
-Copy the example environment file and fill in your OpenAI API key:
-
-```bash
-cp .env.example .env
-# Open .env and add your OPENAI_API_KEY
-```
-
-Or create a .env and then add OPENAI_API_KEY=YOUR_KEY 
-
-### 2. Start the Application Stack
-
-This command will build the Docker images (if not already built), create the necessary containers (PostgreSQL database, API, and Frontend), and start all services in detached mode.
+Create a `.env` file in the root directory:
 
 ```bash
-docker compose up --build -d
+OPENAI_API_KEY=your_openai_api_key_here
 ```
+
+### 2. Start the Full Stack
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Run in background
+docker-compose up -d --build
+```
+
+This will start:
+- **Database**: PostgreSQL with Bella Terra menu data
+- **Database Populator**: Automatically populates the database with menu data
+- **API**: FastAPI backend with CAG system integration
+- **Frontend**: Next.js web interface
 
 ### 3. Access the Application
 
-Once all services are up and running, you can access the application in your browser:
+- **Frontend**: http://localhost:3000
+- **API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
 
-*   **Frontend UI:** `http://localhost:3000`
-*   **Backend API:** `http://localhost:8000`
+## 🐳 Docker Deployment
 
-### Stopping the Application
-
-To stop and remove all running containers, networks, and volumes created by Docker Compose:
+### Full Stack with Docker Compose
 
 ```bash
-docker compose down -v
+# Build and start all services
+docker-compose up --build
+
+# Run in background
+docker-compose up -d --build
+
+# Stop all services
+docker-compose down
 ```
 
-### Viewing Logs
-
-To view real-time logs from all services (useful for debugging):
+### Individual Services
 
 ```bash
-docker compose logs -f
+# Start only the database
+docker-compose up db
+
+# Start database and API
+docker-compose up db api
+
+# Start database and populate it
+docker-compose up db db-populator
 ```
 
-To view logs from a specific service (e.g., the API):
+## 🔧 Development
+
+### API Development
 
 ```bash
-docker compose logs -f api
+cd api
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### CAG System Development
+
+```bash
+cd cag
+pip install -r requirements.txt
+python -c "from core.cag_system import CAGSystem; cag = CAGSystem()"
+```
+
+### Database Population
+
+```bash
+cd db_populator
+pip install -r requirements.txt
+python main.py
+```
+
+### Frontend Development
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ## AI Workflow

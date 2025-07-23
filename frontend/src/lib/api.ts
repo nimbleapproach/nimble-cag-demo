@@ -33,7 +33,7 @@ export const cagApi = {
   // Synchronous query (waits for response)
   query: async (request: QueryRequest): Promise<QueryResponse> => {
     console.log('Sending query:', request)
-    const { data } = await api.post<QueryResponse>('/query', request)
+    const { data } = await api.post<QueryResponse>('/api/query', request)
     console.log('Query response:', data)
     return data
   },
@@ -41,14 +41,14 @@ export const cagApi = {
   // Asynchronous query (returns job ID)
   queryAsync: async (request: QueryRequest): Promise<{ job_id: string }> => {
     console.log('Sending async query:', request)
-    const { data } = await api.post<{ job_id: string }>('/query/async', request)
+    const { data } = await api.post<{ job_id: string }>('/api/query/async', request)
     console.log('Async query response:', data)
     return data
   },
 
   // Check job status
   getJobStatus: async (jobId: string): Promise<JobResponse> => {
-    const { data } = await api.get<JobResponse>(`/jobs/${jobId}`)
+    const { data } = await api.get<JobResponse>(`/api/jobs/${jobId}`)
     console.log(`Job ${jobId} status:`, data)
     return data
   },

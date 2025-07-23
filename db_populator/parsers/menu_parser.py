@@ -1,33 +1,9 @@
 import os
 import re
-import psycopg2
-from psycopg2.extras import execute_batch
-import json
+from typing import List, Dict, Any
 
-def get_db_connection():
-    """Establishes a connection to the PostgreSQL database."""
-    try:
-        conn = psycopg2.connect(
-            host=os.getenv("DB_HOST", "localhost"),
-            dbname=os.getenv("POSTGRES_DB", "bellaterra_db"),
-            user=os.getenv("POSTGRES_USER", "bellaterra"),
-            password=os.getenv("POSTGRES_PASSWORD", "password"),
-            port=os.getenv("DB_PORT", "5432")
-        )
-        return conn
-    except psycopg2.OperationalError as e:
-        print(f"Error connecting to the database: {e}")
-        return None
 
-def create_tables(conn):
-    """Creates database tables from the schema.sql file."""
-    with conn.cursor() as cur:
-        with open("database/schema.sql", "r") as f:
-            cur.execute(f.read())
-    conn.commit()
-    print("Tables created successfully.")
-
-def parse_menu_file(file_path):
+def parse_menu_file(file_path: str) -> List[Dict[str, Any]]:
     """Parses a markdown menu file and extracts items based on common patterns."""
     items = []
     filename = os.path.basename(file_path)
@@ -125,38 +101,9 @@ def parse_menu_file(file_path):
             })
     return items
 
-def insert_menu_items(conn, items):
-    """Inserts a list of menu items into the database."""
-    query = """
-    INSERT INTO menu_items (name, description, price, category, is_vegetarian, is_vegan, is_gluten_free, properties)
-    VALUES (%(name)s, %(description)s, %(price)s, %(category)s, %(is_vegetarian)s, %(is_vegan)s, %(is_gluten_free)s, %(properties)s)
-    ON CONFLICT (name) DO UPDATE SET
-        description = EXCLUDED.description,
-        price = EXCLUDED.price,
-        category = EXCLUDED.category,
-        is_vegetarian = EXCLUDED.is_vegetarian,
-        is_vegan = EXCLUDED.is_vegan,
-        is_gluten_free = EXCLUDED.is_gluten_free,
-        properties = EXCLUDED.properties;
-    """
-    with conn.cursor() as cur:
-        # Convert properties dict to JSON string for insertion
-        for item in items:
-            item['properties'] = json.dumps(item['properties'])
-        
-        execute_batch(cur, query, items)
-    conn.commit()
-    print(f"Inserted {len(items)} items into the database.")
 
-def main():
-    """Main function to orchestrate the database population."""
-    conn = get_db_connection()
-    if not conn:
-        return
-
-    create_tables(conn)
-
-    menu_dir = "BellaTerra"
+def parse_all_menu_files(menu_dir: str) -> List[Dict[str, Any]]:
+    """Parse all menu files in the specified directory."""
     all_items = []
     for filename in os.listdir(menu_dir):
         if filename.endswith(".md") and "about_us" not in filename:
@@ -164,13 +111,4 @@ def main():
             print(f"Parsing {file_path}...")
             parsed_items = parse_menu_file(file_path)
             all_items.extend(parsed_items)
-
-    if all_items:
-        insert_menu_items(conn, all_items)
-    else:
-        print("No items found to insert.")
-
-    conn.close()
-
-if __name__ == "__main__":
-    main()
+    return all_items 

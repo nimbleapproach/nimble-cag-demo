@@ -1,0 +1,12 @@
+# API dependencies
+fastapi==0.104.1
+uvicorn==0.24.0
+python-dotenv==1.0.0
+
+# CAG system dependencies
+crewai>=0.140.0
+crewai-tools>=0.49.0
+chromadb==0.5.23
+markdown==3.5.2
+beautifulsoup4>=4.12.3,<5.0.0
+psycopg2-binary==2.9.9

@@ -13,26 +13,35 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bellaterra -d bellaterra_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   db-populator:
     build:
-      context: .
-      dockerfile: Dockerfile.api
+      context: ./db_populator
+      dockerfile: Dockerfile
     container_name: bella-terra-db-populator
     depends_on:
-      - db
-    command: ["python", "populate_db.py"]
+      db:
+        condition: service_healthy
+    command: ["python", "main.py"]
     environment:
       - DB_HOST=db
       - POSTGRES_DB=bellaterra_db
       - POSTGRES_USER=bellaterra
       - POSTGRES_PASSWORD=password
       - DB_PORT=5432
+    volumes:
+      - ./BellaTerra:/app/BellaTerra
 
   api:
     build:
       context: .
-      dockerfile: Dockerfile.api
+      dockerfile: ./api/Dockerfile
     container_name: bella-terra-api
     restart: always
     depends_on:
@@ -47,8 +56,8 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: bella-terra-frontend
     restart: always
     depends_on:
@@ -56,7 +65,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - NEXT_PUBLIC_API_URL=http://api:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
 
 volumes:
   postgres_data:

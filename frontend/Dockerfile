@@ -2,16 +2,16 @@
 FROM node:18-alpine AS builder
 
 # Set working directory
-WORKDIR /app/frontend
+WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY frontend/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the frontend code
-COPY frontend/ .
+COPY . .
 
 # Build the Next.js application
 RUN npm run build
@@ -20,12 +20,12 @@ RUN npm run build
 FROM node:18-alpine
 
 # Set working directory
-WORKDIR /app/frontend
+WORKDIR /app
 
 # Copy built assets from the builder stage
-COPY --from=builder /app/frontend/.next ./.next
-COPY --from=builder /app/frontend/public ./public
-COPY --from=builder /app/frontend/package.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./
 
 # Install production dependencies (next)
 RUN npm install --production
