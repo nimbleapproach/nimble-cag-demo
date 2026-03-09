@@ -1,0 +1,17 @@
+{
+  "name": "promptfoo-evals",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "eval": "promptfoo eval",
+    "eval:view": "promptfoo view",
+    "eval:ci": "promptfoo eval --no-open"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Promptfoo evals for Bella Terra CAG System",
+  "dependencies": {
+    "promptfoo": "^0.119.6"
+  }
+}

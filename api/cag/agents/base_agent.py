@@ -7,7 +7,7 @@ class BaseAgent:
     """Base class for all CAG system agents"""
     
     def __init__(self, llm: ChatOpenAI = None):
-        self.llm = llm or ChatOpenAI(model="gpt-4o", temperature=0)
+        self.llm = llm or ChatOpenAI(model="gpt-4o-mini", temperature=0)
         self.agent = None
     
     def create_agent(self, role: str, goal: str, backstory: str, tools: List[Any] = None, allow_delegation: bool = False) -> Agent:

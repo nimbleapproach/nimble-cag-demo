@@ -1,0 +1,43 @@
+description: "Promptfoo evals for Bella Terra CAG System"
+
+providers:
+  - id: https
+    config:
+      url: 'http://localhost:8000/api/query'
+      method: 'POST'
+      headers:
+        'Content-Type': 'application/json'
+      body:
+        query: '{{ prompt }}'
+      transformResponse: 'json.response'
+
+tests:
+  - vars:
+      prompt: "What beers cost less than £6?"
+    assert:
+      - type: contains-all
+        value: ["Peroni Nastro Azzurro", "Menabrea Blonde", "York Brewery \"Yorkshire Bitter\"", "Saltaire Brewery \"Saltaire Blonde\"", "Black Sheep Brewery \"Best Bitter\"", "Budvar Original Lager"]
+      - type: llm-rubric
+        value: "The response should list specific beers with prices under £6, including the price for each beer, with no extra elaboration"
+        provider: openai:gpt-4o-mini
+  - vars:
+      prompt: "What pizzas do you have under £12?"
+    assert:
+      - type: contains
+        value: "Margherita"
+      - type: llm-rubric
+        value: "The response should list the specific pizza with a price under £12, including the price the pizza and no extra elaboration"
+        provider: openai:gpt-4o-mini
+  - vars:
+      prompt: "Show me vegetarian options"
+    assert:
+      - type: contains-all
+        value: ["Fusilli al Pesto", "Penne alla Vodka", "Smoked Mackerel Pâté", "Fish of the Day"]
+      - type: llm-rubric
+        value: "The response should list the vegetarian options available, including the price for each item and no extra elaboration"
+        provider: openai:gpt-4o-mini
+
+outputPath: ./output.json
+defaultTest:
+  options:
+    provider: https

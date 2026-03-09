@@ -30,7 +30,7 @@ class CAGSystem:
         self.collection = self.vector_store.collection
         
         # Initialize LLM
-        self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
+        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
         # Initialize database URI
         db_uri = (
@@ -112,7 +112,7 @@ class CAGSystem:
             tasks=[sql_query_task, execute_sql_task, context_analysis_task, augmentation_task, generation_task],
             process=Process.sequential,
             verbose=True,
-            max_rpm=29 # Set a reasonable RPM limit
+            max_rpm=20 # Set a reasonable RPM limit
         )
         
         result = crew.kickoff()
